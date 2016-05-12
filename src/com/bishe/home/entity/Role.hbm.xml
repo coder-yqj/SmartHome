@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2016-2-2 10:40:27 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="com.bishe.home.entity.Role" table="T_ROLE">
+        <id name="rid" type="java.lang.Integer" access="field">
+            <column name="RID" />
+            <generator class="native" />
+        </id>
+        <property name="roleName" type="java.lang.String" access="field">
+            <column name="ROLENAME" />
+        </property>
+        <set name="users" table="T_USER_ROLE"  cascade="all">
+            <key>
+                <column name="ROLE_ID" />
+            </key>
+            <many-to-many column="USER_ID" class="com.bishe.home.entity.User" />
+        </set>
+        
+        <set name="privileges" table="T_ROLE_PRIVILEGE" cascade="all">
+        	  <key>
+                <column name="ROLE_ID" />
+            </key>
+            <many-to-many column="PRIVILEGE_ID" class="com.bishe.home.entity.Privilege" />
+        </set>
+    </class>
+</hibernate-mapping>

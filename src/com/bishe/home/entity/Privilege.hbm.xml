@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2016-2-17 9:37:57 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="com.bishe.home.entity.Privilege" table="T_PRIVILEGE">
+        <id name="pid" type="java.lang.Integer" access="field">
+            <column name="PID" />
+            <generator class="native" />
+        </id>
+        <property name="privilegeName" type="java.lang.String" access="field">
+            <column name="PRIVILEGENAME" />
+        </property>
+        <set name="roles" table="T_ROLE_PRIVILEGE" >
+        	<key column="PRIVILEGE_ID"> </key>
+        	<many-to-many column="ROLE_ID" class="com.bishe.home.entity.Role"></many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

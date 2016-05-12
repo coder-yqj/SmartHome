@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+<!-- 	<constant name="struts.devMode" value="true"/> -->
+	<constant name="struts.objectFactory" value="spring"/>
+	
+	<package name="smarthome" extends="struts-default,json-default">
+		<action name="user_*" 
+		class="userAction" method="{1}">
+			<result name="success" type="dispatcher">main/index.jsp</result>
+		</action>
+		
+		<action name="login_*" class="com.bishe.home.web.action.LoginAction" method="{1}">
+ 			<result name="index">main/index.jsp</result>
+ 			<result name="login">login.jsp</result>
+ 			<result name="register">register.jsp</result>
+			<result type="json"></result>
+		</action>
+		
+		<action name="equipment_*" class="com.bishe.home.web.action.EquipmentAction" 
+			method="{1}">
+			 <result type="json"></result>
+			 <result  name="findAll" type="json">
+			 	<param name="root">jsonObj</param>
+			 </result>
+			 <result name="list" type="json">
+			 	<param name="includeProperties">equipment</param>
+			 </result>
+			 <result name="showEquipment">/main/equipment/showEquipment.jsp</result>
+		</action>
+		
+		<action name="operationLog_*" class="com.bishe.home.web.action.OperationLogAction"
+			method="{1}">
+			<result type="json">
+			</result>
+		</action>
+		
+		<action name="scene_*" class="com.bishe.home.web.action.SceneAction" 
+			method="{1}">
+			<result type="json"></result>	
+			<result name="toPage">/main/scene/showScene.jsp</result>
+<!-- 			<result name="update" type="chain">scene_toShowScene</result> -->
+		</action>
+		
+	</package>
+
+</struts>

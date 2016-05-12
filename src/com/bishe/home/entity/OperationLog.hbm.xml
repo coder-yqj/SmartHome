@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2016-2-19 11:09:01 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="com.bishe.home.entity.OperationLog" table="T_OPERATIONLOG">
+        <id name="id" type="java.lang.Integer">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+        <property name="userId" type="java.lang.Integer">
+            <column name="USERID" />
+        </property>
+        <property name="opTime" type="java.sql.Timestamp">
+            <column name="OPTIME" />
+        </property>
+        <property name="operation" type="java.lang.String">
+            <column name="OPERATION" />
+        </property>
+        <property name="type" type="java.lang.Integer">
+            <column name="TYPE" />
+        </property>
+        
+        
+        <many-to-one name="equipment" class="com.bishe.home.entity.Equipment"  cascade="all">
+            <column name="EQUIPMENTID" />
+        </many-to-one>
+    
+        <many-to-one name="scene" class="com.bishe.home.entity.Scene"  cascade="all">
+            <column name="SCENEID" />
+        </many-to-one>
+    </class>
+</hibernate-mapping>
