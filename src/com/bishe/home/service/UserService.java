@@ -9,4 +9,6 @@ public interface UserService {
 	public void save(User user);
 	
 	public User findById(Integer id);
+	
+	public User findUserByName(String userName);
 }

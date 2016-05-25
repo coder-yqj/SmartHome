@@ -31,18 +31,33 @@
 	<!-- 配置一个通知 指定目标对象中，不同的方法，采用的不同的事务处理方式 -->
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
-			<tx:method name="save" propagation="REQUIRED" isolation="DEFAULT"/>
-			<tx:method name="update"/>
-			<tx:method name="delete"/>
-			<tx:method name="find" propagation="NOT_SUPPORTED" read-only="true"/>
+<!-- 			<tx:method name="save" propagation="REQUIRED" isolation="DEFAULT"/> -->
+<!-- 			<tx:method name="update"/> -->
+<!-- 			<tx:method name="delete"/> -->
+<!-- 			<tx:method name="find" propagation="NOT_SUPPORTED" read-only="true"/> -->
+			<tx:method name="insert*" propagation="REQUIRED" />  
+            <tx:method name="update*" propagation="REQUIRED" />  
+            <tx:method name="edit*" propagation="REQUIRED" />  
+            <tx:method name="save*" propagation="REQUIRED" />  
+            <tx:method name="add*" propagation="REQUIRED" />  
+            <tx:method name="new*" propagation="REQUIRED" />  
+            <tx:method name="set*" propagation="REQUIRED" />  
+            <tx:method name="remove*" propagation="REQUIRED" />  
+            <tx:method name="delete*" propagation="REQUIRED" />  
+            <tx:method name="change*" propagation="REQUIRED" />  
+            <tx:method name="check*" propagation="REQUIRED" />  
+            <tx:method name="get*" propagation="REQUIRED" read-only="true" />  
+            <tx:method name="find*" propagation="REQUIRED" read-only="true" />  
+            <tx:method name="load*" propagation="REQUIRED" read-only="true" />  
+            <tx:method name="*" propagation="REQUIRED" read-only="true" />  
 		</tx:attributes>
 	</tx:advice>
 <!-- 	 指定哪些包中的类中的哪些方法 被调用时  处理事务 -->
 	 <aop:config>
 	 	<aop:pointcut id="servicePoint" expression="execution(* com.bishe.home.service.*.*(..))" />
-	 	<aop:pointcut id="servicePoint1" expression="execution(* com.bishe.home.dao.DaoSupport.*(..))" />
+<!-- 	 	<aop:pointcut id="servicePoint1" expression="execution(* com.bishe.home.dao.DaoSupport.*(..))" /> -->
 	 	<aop:advisor advice-ref="txAdvice" pointcut-ref="servicePoint"/>
-	 	<aop:advisor advice-ref="txAdvice" pointcut-ref="servicePoint1"/>
+<!-- 	 	<aop:advisor advice-ref="txAdvice" pointcut-ref="servicePoint1"/> -->
 		
 	 </aop:config>
 	 

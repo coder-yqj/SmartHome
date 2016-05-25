@@ -4,13 +4,18 @@ import java.util.LinkedHashMap;
 
 import javax.annotation.Resource;
 
+import net.sf.json.JSONObject;
+
 import org.springframework.stereotype.Service;
 
+import com.baidu.yun.push.exception.PushClientException;
+import com.baidu.yun.push.exception.PushServerException;
 import com.bishe.home.dao.EquipmentDao;
 import com.bishe.home.dao.OperationLogDao;
 import com.bishe.home.dao.SceneDao;
 import com.bishe.home.domain.Device;
 import com.bishe.home.domain.Message;
+import com.bishe.home.domain.PublishMsg;
 import com.bishe.home.entity.Equipment;
 import com.bishe.home.entity.OperationLog;
 import com.bishe.home.entity.QueryResult;
@@ -21,7 +26,7 @@ import com.bishe.home.util.GetDateUtil;
 import com.bishe.home.util.GetSessionUtil;
 import com.bishe.home.util.GetUserUtil;
 @Service("equipmentService")
-public class EquipmentServiceImpl extends Subject implements EquipmentService{
+public class EquipmentServiceImpl implements EquipmentService{
 
 	@Resource(name="equipmentDao")
 	private EquipmentDao equipmentDao;
@@ -39,15 +44,20 @@ public class EquipmentServiceImpl extends Subject implements EquipmentService{
 		int maxResult = page*row;
 		LinkedHashMap<String, String> orderby = new LinkedHashMap<String, String>();
 		orderby.put("id", "asc");	
+		QueryResult<Equipment> scrollData  = null;
 		if(sceneId==0){
 			String where = "userid=?";
 			Object[] params = new Object[]{GetUserUtil.getUser().getId()};
-			return equipmentDao.getScrollData(firstResult, maxResult, where, params, orderby);
+			scrollData = equipmentDao.getScrollData(firstResult, maxResult, where, params, orderby);
 		}else{
 			String where = "userid=? and sceneId=?";
 			Object[] params = new Object[]{GetUserUtil.getUser().getId(),sceneId};
-			return equipmentDao.getScrollData(firstResult, maxResult, where, params, orderby);
+			scrollData = equipmentDao.getScrollData(firstResult, maxResult, where, params, orderby);
 		}
+		for(Equipment eq:scrollData.getRows()){
+			eq.setSceneId(sceneId);
+		}
+		return scrollData;
 		
 	}
 
@@ -95,15 +105,23 @@ public class EquipmentServiceImpl extends Subject implements EquipmentService{
 	}
 
 	@Override
-	public void turnOn(Integer equipmentId) {
-		equipmentDao.turnOn(equipmentId);
+	public OperationLog changeState(Equipment cEquipment) {
+		if(cEquipment.getState()==1){
+			equipmentDao.turnOn(cEquipment.getId());
+		}else{
+			equipmentDao.turnOff(cEquipment.getId());
+		}
 		OperationLog log = new OperationLog();
-		Equipment equipment = equipmentDao.findById(equipmentId);
+		Equipment equipment = equipmentDao.findById(cEquipment.getId());
 		log.setEquipment(equipment);
 		log.setScene(equipment.getScene());
 		log.setOpTime(GetDateUtil.getDate());
 		log.setUserId(GetUserUtil.getUser().getId());
-		log.setOperation(equipment.getName()+"打开");
+		if(cEquipment.getState()==1){
+			log.setOperation(equipment.getName()+"打开");
+		}else{
+			log.setOperation(equipment.getName()+"关闭");
+		}
 		log.setType(0);
 		if(equipment.getIsRemind()==1){
 			log.setType(1);
@@ -114,16 +132,35 @@ public class EquipmentServiceImpl extends Subject implements EquipmentService{
 //			remind.setOperation(equipment.getName()+"被打开。");
 //			remind.setEquipment(equipment);
 //			remind.setScene(equipment.getScene());
-			Device device = new Device((Long)GetSessionUtil.getSession().getAttribute("channelId"),(String)GetSessionUtil.getSession().getAttribute("userId"));
-			this.attach(device);
-			this.nodifyObservers(new Message("安居",equipment.getName()+"被打开。"));
+			if(GetSessionUtil.getSession().getAttribute("channelId")!=null&&GetSessionUtil.getSession().getAttribute("userId")!=null){
+//				Device device = new Device((Long)GetSessionUtil.getSession().getAttribute("channelId"),(String)GetSessionUtil.getSession().getAttribute("userId"));
+//				this.attach(device);
+//				if(cEquipment.getState()==1){
+//					this.nodifyObservers(new Message("安居",equipment.getName()+"被打开。"));
+//				}else{
+//					this.nodifyObservers(new Message("安居",equipment.getName()+"被关闭。"));
+//				}
+//				this.detach(device);
+				PublishMsg psh = new PublishMsg((Long)GetSessionUtil.getSession().getAttribute("channelId"),(String)GetSessionUtil.getSession().getAttribute("userId"));
+				JSONObject notification = null;
+				if(cEquipment.getState()==1){
+					notification = JSONObject.fromObject(new Message("安居",equipment.getName()+"被打开。"));
+				}else{
+					notification = JSONObject.fromObject(new Message("安居",equipment.getName()+"被关闭。"));
+				}
+				try {
+					psh.push(notification);
+				} catch (PushClientException | PushServerException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		operationLogDao.save(log);
 		
-		
+		return log;
 	}
 
-	@Override
+	/*@Override
 	public void turnOff(Integer equipmentId) {
 		equipmentDao.turnOff(equipmentId);
 		OperationLog log = new OperationLog();
@@ -149,7 +186,7 @@ public class EquipmentServiceImpl extends Subject implements EquipmentService{
 			this.nodifyObservers(new Message("安居",equipment.getName()+"被关闭。"));
 		}
 		operationLogDao.save(log); 
-	}
+	}*/
 	
 	
 	public void chengeTo(Double value,Integer equipmentId){
@@ -166,8 +203,8 @@ public class EquipmentServiceImpl extends Subject implements EquipmentService{
 		if(equipment.getIsRemind()==1){
 			log.setType(1);
 			Device device = new Device((Long)GetSessionUtil.getSession().getAttribute("channelId"),(String)GetSessionUtil.getSession().getAttribute("userId"));
-			this.attach(device);
-			this.nodifyObservers(new Message("安居",equipment.getName()+"变化到 "+value));
+//			this.attach(device);
+//			this.nodifyObservers(new Message("安居",equipment.getName()+"变化到 "+value));
 		}
 		operationLogDao.save(log); 
 	}
@@ -200,6 +237,14 @@ public class EquipmentServiceImpl extends Subject implements EquipmentService{
 		equipmentDao.save(water);
 		equipmentDao.save(electric);
 		equipmentDao.save(gas);
+		
+	}
+
+	@Override
+	public QueryResult<Equipment> findTemperature() {
+		String where = "userId=? and type=?";
+		Object[] params = new Object[]{GetUserUtil.getUser().getId(),1};
+		return equipmentDao.getScrollData(-1, -1, where, params);
 		
 	}
 	

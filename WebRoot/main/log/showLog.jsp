@@ -96,37 +96,37 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
           } ] ], 
 
-          toolbar : [ { 
+//           toolbar : [ { 
 
-              text : '增加', 
+//               text : '增加', 
 
-              iconCls : 'icon-add', 
+//               iconCls : 'icon-add', 
 
-              handler : function() { 
+//               handler : function() { 
            
-              } 
+//               } 
 
-          }, '-', { 
+//           }, '-', { 
 
-              text : '删除', 
+//               text : '删除', 
 
-              iconCls : 'icon-remove', 
+//               iconCls : 'icon-remove', 
 
-              handler : function() { 
+//               handler : function() { 
              		 
-             	 }
+//              	 }
 
-          }, '-', { 
+//           }, '-', { 
 
-              text : '编辑', 
+//               text : '编辑', 
 
-              iconCls : 'icon-edit', 
+//               iconCls : 'icon-edit', 
 
-              handler : function() { 
+//               handler : function() { 
               	
-              } 
+//               } 
 
-          } ] 
+//           } ] 
       }); 
       
       

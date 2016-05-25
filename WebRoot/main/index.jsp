@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UtF-8" contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -32,7 +33,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<div data-options="region:'north',border:false" style="height:60px;background:#fff;padding:0px">
     	<div class="site_title">安居后台管理系统</div>
         <div id="sessionInfoDiv" style="position: absolute;right: 5px;top:10px;">
-            [<strong>${session.user.userName }</strong>]，欢迎你！您使用[<strong>123.232.103.195</strong>]IP登录！
+            [<strong><shiro:principal/></strong>]，欢迎你！
         </div>
         <div style="position: absolute; right: 0px; bottom: 0px; ">
             <a href="javascript:void(0);" class="easyui-menubutton" data-options="menu:'#layout_north_pfMenu',iconCls:'icon-ok'">更换皮肤</a> <a href="javascript:void(0);" class="easyui-menubutton" data-options="menu:'#layout_north_kzmbMenu',iconCls:'icon-help'">控制面板</a> <a href="javascript:void(0);" class="easyui-menubutton" data-options="menu:'#layout_north_zxMenu',iconCls:'icon-back'">注销</a>
@@ -74,19 +75,19 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                     <span>日志管理</span>
                     <ul>
                         <li><a href="javascript:viod(0);" cmshref="<%=path%>/main/log/showLog.jsp" type="nav_foot">日志列表</a></li>
-                        <li><a href="javascript:viod(0);" cmshref="<%=path%>/main/log/showRemind.jsp" type="nav_foot" rel="">新闻分类</a></li>
+                        <li><a href="javascript:viod(0);" cmshref="<%=path%>/main/log/showRemind.jsp" type="nav_foot" rel="">提醒列表</a></li>
                     </ul>
              </li>
             <li data-options="state:'open'">
                     <span>设备管理</span>
                     <ul>
                         <li><a href="javascript:viod(0);" cmshref="${pageContext.request.contextPath}/equipment_toShowSceneEq.action?sceneId=0" type="nav_foot" rel="">设备列表</a></li>                
-                        <li><a href="javascript:viod(0);" cmshref="${pageContext.request.contextPath}/main/equipment/showConsume.jsp"  >消费单</a></li>
+<!--                         <li><a href="javascript:viod(0);" cmshref="${pageContext.request.contextPath}/main/equipment/showConsume.jsp"  >消费单</a></li> -->
                     </ul>
              </li>
         </ul>
     </div><!--waiceng-->
-    <div title="客服中心" data-options="iconCls:'icon-mini-add'" style="padding:10px;">
+  <!--   <div title="客服中心" data-options="iconCls:'icon-mini-add'" style="padding:10px;">
         <ul class="easyui-tree" data-options="animate:true">
             <li data-options="state:'closed'">
                     <span>文档管理</span>
@@ -113,7 +114,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                     <ul>
                         <li><a href="javascript:viod(0);" cmshref="/admin.php/Block/index" type="block_list" rel="">碎片列表</a></li><li><a href="javascript:viod(0);" cmshref="/admin.php/Block/sort" type="block_cat" rel="">碎片分类</a></li>                    </ul>
                 </li>        </ul>
-    </div><!--waiceng--><div title="帐号中心" data-options="iconCls:'icon-mini-add'" style="padding:10px;">
+    </div>waiceng<div title="帐号中心" data-options="iconCls:'icon-mini-add'" style="padding:10px;">
         <ul class="easyui-tree" data-options="animate:true">
             <li data-options="state:'closed'">
                     <span>会员管理</span>
@@ -128,7 +129,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                     <ul>
                         <li><a href="javascript:viod(0);" cmshref="www.baidu.com" type="frontcom_cat" rel="">前台权限分类</a></li><li><a href="javascript:viod(0);" cmshref="www.baidu.com" type="frontcom_list" rel="">前台权限列表</a></li>                    </ul>
                 </li>        </ul>
-    </div>           <!--//左侧菜单导航-->
+    </div>           //左侧菜单导航 -->
         </div><!--accordion-->
 
     </div><!--west-->

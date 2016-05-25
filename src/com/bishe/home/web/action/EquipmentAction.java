@@ -1,6 +1,7 @@
 package com.bishe.home.web.action;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,9 +23,8 @@ import com.baidu.yun.push.exception.PushServerException;
 import com.bishe.home.domain.Message;
 import com.bishe.home.domain.PublishMsg;
 import com.bishe.home.entity.Equipment;
+import com.bishe.home.entity.OperationLog;
 import com.bishe.home.entity.QueryResult;
-import com.bishe.home.entity.Scene;
-import com.bishe.home.entity.User;
 import com.bishe.home.service.EquipmentService;
 import com.bishe.home.util.GetUserUtil;
 import com.bishe.home.util.JsonUtil;
@@ -58,7 +58,12 @@ public class EquipmentAction {
 
 	static Logger logger = Logger.getLogger(EquipmentAction.class);
 
-	public void testPublish() {
+	public void savePublish() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpSession session = request.getSession();
+		session.setAttribute("channelId", channelId);
+		session.setAttribute("userId", userId);
+		System.out.println("channelId:"+channelId+"---userId:"+userId);
 		PublishMsg psh = new PublishMsg(channelId, userId);
 		Message message = new Message();
 		message.setTitle("安居");
@@ -74,15 +79,22 @@ public class EquipmentAction {
 	}
 
 	// 打开设备开关
-	public void turnOn() {
-		logger.info("turn on the equipment");
-		equipmentService.turnOn(equipmentId);
+	public void changeState() throws Exception {
+		logger.info("changeState the equipment");
+		OperationLog log = null;
+		try {
+			 log = equipmentService.changeState(equipment);
+			ReturnUtil.returnJsonStr(JsonUtil.getJsonStr(1, equipment.getState().toString(),log,new String[] { "equipment","scene" }));
+		} catch (Exception e) {
+			ReturnUtil.returnJsonStr(JsonUtil.getJsonStr(0, equipment.getState().toString(),log,new String[] { "equipment","scene" }));
+			e.printStackTrace();
+		}
 	}
 
-	public void turnOff() {
-		logger.info("turn off the equipment");
-		equipmentService.turnOff(equipmentId);
-	}
+//	public void turnOff() {
+//		logger.info("turn off the equipment");
+//		equipmentService.turnOff(equipmentId);
+//	}
 
 	public void changeValue() {
 		logger.info("change the equipment value to " + value);
@@ -96,6 +108,7 @@ public class EquipmentAction {
 		logger.info("Enter findByPage() method...");
 		QueryResult<Equipment> queryResult = equipmentService.findByPage(page,
 				rows, sceneId);
+//		System.out.println("------------------------"+queryResult.getRows());
 		// this.toBeJson(queryResult.getRows(), (int) queryResult.getTotal());
 		ReturnUtil.returnJsonStr(JsonUtil.getJsonStr(1, queryResult,
 				new String[] { "scene" }));
@@ -147,7 +160,13 @@ public class EquipmentAction {
 	// 编辑设备
 	public void edit() throws Exception {
 		logger.info("Enter edit method  Equipment is" + equipment);
-		equipmentService.update(equipment);
+		try {
+			equipmentService.update(equipment);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			ReturnUtil.returnJsonStr(JsonUtil.getJsonStr(0, "保存失败"));
+		}
 		logger.info("edit method end ...");
 		ReturnUtil.returnJsonStr(JsonUtil.getJsonStr(1, "保存成功"));
 	}
@@ -192,6 +211,7 @@ public class EquipmentAction {
 	public void findBySceneId() throws Exception {
 		QueryResult<Equipment> queryResult = equipmentService
 				.findBySceneId(sceneId);
+		System.out.println("-----------"+queryResult.getRows());
 		try {
 			ReturnUtil.returnJsonStr(JsonUtil.getJsonStr(1,
 					queryResult.getRows(), new String[] { "scene" }));
@@ -201,6 +221,23 @@ public class EquipmentAction {
 			logger.error("返回所有设备出错。");
 		}
 	}
+	
+	//查看温度
+	public void findTemperature() throws Exception{
+		QueryResult<Equipment> queryResult =null;
+		try {
+			 queryResult = equipmentService.findTemperature();
+		} catch (Exception e) {
+			ReturnUtil.returnJsonStr(JsonUtil.getJsonStr(0, "返回温度出错"));
+			logger.error("返回温度出错。");
+			e.printStackTrace();
+		}
+		ReturnUtil.returnJsonStr(JsonUtil.getJsonStr(1,
+				"当前室温："+queryResult.getRows().get(0).getValue()+" ℃"));
+		
+	}
+	
+	
 
 	public void toBeJson(List list, int total) throws Exception {
 		HttpServletResponse response = ServletActionContext.getResponse();

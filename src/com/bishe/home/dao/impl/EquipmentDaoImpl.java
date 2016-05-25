@@ -70,7 +70,8 @@ public class EquipmentDaoImpl extends DaoSupport<Equipment> implements Equipment
 		getHibernateTemplate().update(eq);
 	}
 
-	
 
+	
+	
 
 }

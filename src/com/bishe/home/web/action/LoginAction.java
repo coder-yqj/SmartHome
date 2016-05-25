@@ -7,9 +7,17 @@ import javax.servlet.http.HttpSession;
 import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.Subject;
 import org.apache.struts2.ServletActionContext;
 import org.springframework.stereotype.Controller;
 
+import com.baidu.yun.push.exception.PushClientException;
+import com.baidu.yun.push.exception.PushServerException;
+import com.bishe.home.domain.Message;
+import com.bishe.home.domain.PublishMsg;
 import com.bishe.home.entity.User;
 import com.bishe.home.service.EquipmentService;
 import com.bishe.home.service.LoginService;
@@ -31,7 +39,28 @@ public class LoginAction {
 	static Logger logger = Logger.getLogger(LoginAction.class);
 	
 	public String loginWeb() throws Exception{
-		   HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletRequest request = ServletActionContext.getRequest();
+		Subject subject=SecurityUtils.getSubject();
+		UsernamePasswordToken token=new UsernamePasswordToken(user.getUserName(), user.getPassword());
+		try{
+			subject.login(token);
+			User dUser = loginService.login(user.getUserName());
+			HttpSession session = request.getSession();
+//			User currentUser = (User) SecurityUtils.getSubject(); 
+			session.setAttribute("user", dUser);
+//			session.setAttribute("channelId", channelId);
+//			session.setAttribute("userId", userId);
+//			Session session=subject.getSession();
+//			session.setAttribute("user",  user);
+//			ReturnUtil.returnJsonStr(JsonUtil.getJsonStr("1", "登录成功"));
+			return "index";
+		}catch(Exception e){
+			e.printStackTrace();
+//			ReturnUtil.returnJsonStr(JsonUtil.getJsonStr("0", "账号密码错误"));
+			request.setAttribute("message", "账号或密码错误！");
+			return "login";
+		}
+		/* HttpServletRequest request = ServletActionContext.getRequest();
 			User dUser = loginService.login(user.getUserName());
 			if(dUser==null){
 				request.setAttribute("message", "无此账号！");
@@ -45,26 +74,42 @@ public class LoginAction {
 				session.setAttribute("userId", userId);
 				return "index";
 			}
-			return "login";
+			return "login";*/
 		}
 	
 	public String login() throws Exception{
-	   HttpServletRequest request = ServletActionContext.getRequest();
-		User dUser = loginService.login(user.getUserName());
-		if(dUser==null){
-			request.setAttribute("message", "无此账号！");
-		}else if(!dUser.getPassword().equals(user.getPassword())){
-			request.setAttribute("message", "密码错误！");
-		}else{
+		HttpServletRequest request = ServletActionContext.getRequest();
+		Subject subject=SecurityUtils.getSubject();
+		UsernamePasswordToken token=new UsernamePasswordToken(user.getUserName(), user.getPassword());
+		try{
+			subject.login(token);
+			User dUser = loginService.login(user.getUserName());
 			HttpSession session = request.getSession();
-			dUser.setPassword("");
 			session.setAttribute("user", dUser);
-			ReturnUtil.returnJsonStr(JsonUtil.getJsonStr("message", "登录成功"));
+			ReturnUtil.returnJsonStr(JsonUtil.getJsonStr(1, "登录成功"));
 			return null;
-			//return "index";
+		}catch(Exception e){
+			e.printStackTrace();
+			ReturnUtil.returnJsonStr(JsonUtil.getJsonStr(0, "账号密码错误"));
+			return null;
 		}
-		ReturnUtil.returnJsonStr(JsonUtil.getJsonStr("message", "账号密码错误"));
-		return null;
+		
+		
+//		User dUser = loginService.login(user.getUserName());
+//		if(dUser==null){
+//			request.setAttribute("message", "无此账号！");
+//		}else if(!dUser.getPassword().equals(user.getPassword())){
+//			request.setAttribute("message", "密码错误！");
+//		}else{
+//			HttpSession session = request.getSession();
+//			dUser.setPassword("");
+//			session.setAttribute("user", dUser);
+//			ReturnUtil.returnJsonStr(JsonUtil.getJsonStr("1", "登录成功"));
+//			return null;
+//			//return "index";
+//		}
+//		ReturnUtil.returnJsonStr(JsonUtil.getJsonStr("0", "账号密码错误"));
+//		return null;
 		//return "login";
 	}
 	
@@ -103,6 +148,28 @@ public class LoginAction {
 		}
 		
 	}
+	
+	//保持channelId和userId
+	public void savePublish() {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpSession session = request.getSession();
+		session.setAttribute("channelId", channelId);
+		session.setAttribute("userId", userId);
+//		System.out.println("channelId:"+channelId+"---userId:"+userId);
+//		PublishMsg psh = new PublishMsg(channelId, userId);
+//		Message message = new Message();
+//		message.setTitle("安居");
+//		message.setDescription("设备推送测试");
+//		JSONObject notification = JSONObject.fromObject(message);
+//		try {
+//			psh.push(notification);
+//		} catch (PushClientException e) {
+//			e.printStackTrace();
+//		} catch (PushServerException e) {
+//			e.printStackTrace();
+//		}
+	}
+	
 
 	public User getUser() {
 		return user;

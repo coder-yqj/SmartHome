@@ -28,9 +28,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
  
 	$(function() { 
 	  
-      $("#logGrid").datagrid({ 
+      $("#remindLogGrid").datagrid({ 
  
-     	  url : '${pageContext.request.contextPath}/operationLog_findByCondition.action', 
+     	  url : '${pageContext.request.contextPath}/operationLog_findByCondition.action?logPage.type=1', 
 
           title : '日志列表', 
 
@@ -96,37 +96,37 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
           } ] ], 
 
-          toolbar : [ { 
+//           toolbar : [ { 
 
-              text : '增加', 
+//               text : '增加', 
 
-              iconCls : 'icon-add', 
+//               iconCls : 'icon-add', 
 
-              handler : function() { 
+//               handler : function() { 
            
-              } 
+//               } 
 
-          }, '-', { 
+//           }, '-', { 
 
-              text : '删除', 
+//               text : '删除', 
 
-              iconCls : 'icon-remove', 
+//               iconCls : 'icon-remove', 
 
-              handler : function() { 
+//               handler : function() { 
              		 
-             	 }
+//              	 }
 
-          }, '-', { 
+//           }, '-', { 
 
-              text : '编辑', 
+//               text : '编辑', 
 
-              iconCls : 'icon-edit', 
+//               iconCls : 'icon-edit', 
 
-              handler : function() { 
+//               handler : function() { 
               	
-              } 
+//               } 
 
-          } ] 
+//           } ] 
       }); 
       
       
@@ -138,7 +138,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	  	   success: function(data){
 	  		   var temp = { "id": 0, "sceneName": "所有" ,"selected":true};
 	  		   data.message.unshift(temp);//数组最前面加一条记录
-	  		   $('#sceneBox').combobox("loadData", data.message);
+	  		   $('#sceneBox2').combobox("loadData", data.message);
 	  	   }                                                                                         
 	  	});
 
@@ -150,13 +150,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     	   success: function(data){
     		   var temp = { "id": 0, "name": "所有" ,"selected":true};
     		   data.message.unshift(temp);//数组最前面加一条记录
-    		   $('#eqBox').combobox("loadData", data.message);
+    		   $('#eqBox2').combobox("loadData", data.message);
     	   }                                                                                         
     	});
       //改变场景，设置设备的combobox选项
-      $('#sceneBox').combobox({
+      $('#sceneBox2').combobox({
 		  onSelect: function (n,o) {
-			  var sceneId =  $('#sceneBox').combobox('getValue');
+			  var sceneId =  $('#sceneBox2').combobox('getValue');
 			  $.ajax({
 		    	   type: "POST",
 		    	   url: "${pageContext.request.contextPath}/equipment_findBySceneId.action",
@@ -165,7 +165,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		    	   success: function(data){
 		    		   var temp = { "id": 0, "name": "所有" ,"selected":true};
 		    		   data.message.unshift(temp);//数组最前面加一条记录
-		    		   $('#eqBox').combobox("loadData", data.message);
+		    		   $('#eqBox2').combobox("loadData", data.message);
 		    	   }                                                                                         
 		    	});
 		  }
@@ -174,11 +174,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
       
      //给搜索按钮绑定提交表单事件
      $('#search').click(function() {
-    	 $('#logGrid').datagrid('load',{
-    		 'logPage.sceneId' : $('#sceneBox').combobox('getValue'),
-    		 'logPage.eqId' : $('#eqBox').combobox('getValue'),
+    	 $('#remindLogGrid').datagrid('load',{
+    		 'logPage.sceneId' : $('#sceneBox2').combobox('getValue'),
+    		 'logPage.eqId' : $('#eqBox2').combobox('getValue'),
     		 'logPage.startDate': $('#startDate').datebox('getValue'),
-    		 'logPage.endDate': $('#endDate').datebox('getValue')
+    		 'logPage.endDate': $('#endDate').datebox('getValue'),
+    		 'logPage.type': 1
     		});;
 	
      
@@ -202,14 +203,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<tr>
 			<td style="padding-left: 30px;">场景选择:</td>
 			<td>
-				<select id="sceneBox" class="easyui-combobox" name="logPage.sceneId" style="width:130px;" data-options="valueField:'id', textField:'sceneName', panelHeight:'auto'">
+				<select id="sceneBox2" class="easyui-combobox" name="logPage.sceneId" style="width:130px;" data-options="valueField:'id', textField:'sceneName', panelHeight:'auto'">
 					<!-- <option value="0" >所有</option> -->
 				</select>
 			</td>
 			
 			<td style="padding-left: 30px;">设备选择:</td>
 			<td>
-				<select id="eqBox" class="easyui-combobox" name="logPage.eqId" style="width:130px;" data-options="valueField:'id', textField:'name', panelHeight:'auto'">
+				<select id="eqBox2" class="easyui-combobox" name="logPage.eqId" style="width:130px;" data-options="valueField:'id', textField:'name', panelHeight:'auto'">
 					<!-- <option value="0" >所有</option> -->
 				</select>
 			</td>
@@ -236,7 +237,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	</div>
 	<div style="margin:20px 0;"></div>
 	<div style="margin-left: 150px ;width:700px; height: 300px">
-		 <table id="logGrid"></table>  
+		 <table id="remindLogGrid"></table>  
 	</div>	
 		
 		
